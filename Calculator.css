@@ -1,0 +1,40 @@
+#calculator-background {
+  background-color: black;
+  margin-top: 200px;
+  margin-bottom: 200px;
+  height: 375px;
+  margin-left: 25%;
+  margin-right: 25%;
+  padding-left: 4%;
+  padding-right: 4%;
+  border-radius: 20px;
+}
+
+.blank-space {
+  height: 20px;
+}
+
+.panel {
+  background-color: white;
+  border-radius: 3px;
+  text-align: right;
+  justify-content: center;
+  height: 50px;
+}
+
+.button-row {
+  background-color: white;
+  border-radius: 3px;
+  text-align: center;
+  height: 35px;
+}
+
+.panel-text {
+  font-size: 40px;
+  margin-right: 4%;
+  margin-left: 4%;
+}
+
+.font-styles {
+  font-family: sans-serif;
+}
