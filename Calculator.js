@@ -1,7 +1,6 @@
 let previousString = "";
 let previousOperand = "";
 let displayString = "";
-let previousInput = "";
 
 const panelDisplay = document.getElementById("panelDisplay");
 
@@ -10,17 +9,10 @@ function logButton(input) {
     clearValues();
   } else if (isOperand(input)) {
     displayString = calculateValue(input);
-  } else if (isOperand(previousInput)) {
-    displayString = handleNewNumber(input);
   } else {
     updateNumber(input);
   }
 
-  console.log("PreviousString = ", previousString);
-  console.log("PreviousOperand = ", previousOperand);
-  console.log("displayString = ", displayString);
-
-//  previousInput = input;
   panelDisplay.innerHTML = displayString;
 }
 
@@ -53,16 +45,7 @@ function isInvalidCalculation() {
   return displayString == "";
 }
 
-function handleNewNumber(input) {
-  previousString = displayString;
-  displayString = '';
-  return input;
-}
-
 function calculateValue(input) {
-  console.log("Calculating... Previous String =", previousString);
-  console.log("PreviousOperand = ", previousOperand);
-  console.log("displayString = ", displayString);
   if (isInvalidCalculation()) {
     return "NaN";
   }
@@ -114,5 +97,11 @@ function evaluate(input) {
       return "NaN";
   }
 
-  return (Math.round(result * 100000) / 100000).toString();
+  // Rounding off to 5 significant figures.
+  return (sigFigs(result, 5)).toString();
+}
+
+function sigFigs(n, sig) {
+  var mult = Math.pow(10, sig - Math.floor(Math.log(n) / Math.LN10) - 1);
+  return Math.round(n * mult) / mult;
 }
