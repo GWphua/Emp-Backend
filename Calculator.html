@@ -11,38 +11,41 @@
     <div id="calculator-background">
       <div class="blank-space"></div>
       <div class="panel font-styles">
-        <strong class="panel-text">25</strong>
+        <strong id="panelDisplay" class="panel-text"></strong>
       </div>
       <div class="blank-space"></div>
       <div class="button-row">
-        <button class="calculator-button">7</button>
-        <button class="calculator-button">8</button>
-        <button class="calculator-button">9</button>
-        <button class="calculator-button">/</button>
+        <button onclick="logButton('7')" class="calculator-button">7</button>
+        <button onclick="logButton('8')" class="calculator-button">8</button>
+        <button onclick="logButton('9')" class="calculator-button">9</button>
+        <button onclick="logButton('/')" class="calculator-button">/</button>
       </div>
       <div class="blank-space"></div>
       <div class="button-row">
-        <button class="calculator-button">4</button>
-        <button class="calculator-button">5</button>
-        <button class="calculator-button">6</button>
-        <button class="calculator-button">X</button>
+        <button onclick="logButton('4')" class="calculator-button">4</button>
+        <button onclick="logButton('5')" class="calculator-button">5</button>
+        <button onclick="logButton('6')" class="calculator-button">6</button>
+        <button onclick="logButton('*')" class="calculator-button">X</button>
       </div>
       <div class="blank-space"></div>
       <div class="button-row">
-        <button class="calculator-button">1</button>
-        <button class="calculator-button">2</button>
-        <button class="calculator-button">3</button>
-        <button class="calculator-button">-</button>
-      </div>
-      <div class="button-row">
-        <button class="calculator-wide-button">0</button>
-        <button class="calculator-button">.</button>
-        <button class="calculator-button">+</button>
+        <button onclick="logButton('1')" class="calculator-button">1</button>
+        <button onclick="logButton('2')" class="calculator-button">2</button>
+        <button onclick="logButton('3')" class="calculator-button">3</button>
+        <button onclick="logButton('-')" class="calculator-button">-</button>
       </div>
       <div class="blank-space"></div>
       <div class="button-row">
-        <button class="calculator-full-button">=</button>
+        <button onclick="logButton('0')" class="calculator-button">0</button>
+        <button onclick="logButton('.')" class="calculator-button">.</button>
+        <button onClick="logButton('C')" class="calculator-button">C</button>
+        <button onclick="logButton('+')" class="calculator-button">+</button>
+      </div>
+      <div class="blank-space"></div>
+      <div class="button-row">
+        <button onclick="logButton('=')" class="calculator-equal">=</button>
       </div>
     </div>
+    <script src="Calculator.js"></script>
   </body>
 </html>
