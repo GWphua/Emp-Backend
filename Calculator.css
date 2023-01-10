@@ -5,8 +5,8 @@
   height: 375px;
   margin-left: 25%;
   margin-right: 25%;
-  padding-left: 4%;
-  padding-right: 4%;
+  padding-left: 3%;
+  padding-right: 3%;
   border-radius: 20px;
 }
 
@@ -16,23 +16,48 @@
 
 .panel {
   background-color: white;
-  border-radius: 3px;
+  border-radius: 5px;
   text-align: right;
   justify-content: center;
   height: 50px;
 }
 
-.button-row {
-  background-color: white;
-  border-radius: 3px;
-  text-align: center;
-  height: 35px;
-}
-
 .panel-text {
   font-size: 40px;
-  margin-right: 4%;
-  margin-left: 4%;
+  margin-right: 8%;
+  margin-left: 8%;
+}
+
+.button-row {
+  background-color: black;
+  border-radius: 5px;
+  justify-content: space-between;
+  height: 35px;
+  display: flex;
+}
+
+button {
+  height: 35px;
+  border-radius: 5px;
+  font-family: sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.calculator-button {
+  background-color: white;
+  width: 20%;
+}
+
+.calculator-wide-button {
+  background-color: white;
+  width: 46.666%;
+}
+
+.calculator-full-button {
+  background-color: orange;
+  width: 100%;
 }
 
 .font-styles {
