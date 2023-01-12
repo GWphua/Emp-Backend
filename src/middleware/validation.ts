@@ -5,8 +5,8 @@ import { ErrorResponse } from "../model/errorResponse";
 export const validityHandler: RequestHandler<any> = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().required(),
-    salary: Joi.number().integer(),
-    department: Joi.string().valid("PS", "HR"),
+    salary: Joi.number().integer().strict().required(),
+    department: Joi.string().valid("PS", "HR").required(),
   });
 
   const value = schema.validate(req.body);
