@@ -9,15 +9,6 @@ function getEmployeeIndex(id: number): number {
   return employees.findIndex((employee) => employee.id == id);
 }
 
-function isSameEmployee(emp1: EmployeeDef, emp2: EmployeeDef) {
-  return (
-    emp1.department == emp2.department &&
-    emp1.id == emp2.id &&
-    emp1.name == emp2.name &&
-    emp1.salary == emp2.salary
-  );
-}
-
 export const createEmployee: RequestHandler = (req, res, next) => {
   const request = req.body as EmployeeRequest;
 
@@ -72,7 +63,7 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = (
     updateRequest.department
   );
 
-  if (isSameEmployee(updatedEmployee, employees[empIndex])) {
+  if (JSON.stringify(updatedEmployee) === JSON.stringify(employees[empIndex])) {
     res.status(304).json();
   } else {
     employees[empIndex] = updatedEmployee;
@@ -92,6 +83,6 @@ export const deleteEmployee: RequestHandler<{ emp_id: number }> = (
     res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
     employees.splice(empIndex, 1);
-    res.status(204);
+    res.status(204).json();
   }
 };
