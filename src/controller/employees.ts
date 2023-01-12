@@ -9,6 +9,15 @@ function getEmployeeIndex(id: number): number {
   return employees.findIndex((employee) => employee.id == id);
 }
 
+function isSameEmployee(emp1: EmployeeDef, emp2: EmployeeDef) {
+  return (
+    emp1.department == emp2.department &&
+    emp1.id == emp2.id &&
+    emp1.name == emp2.name &&
+    emp1.salary == emp2.salary
+  );
+}
+
 export const createEmployee: RequestHandler = (req, res, next) => {
   const request = req.body as EmployeeRequest;
 
@@ -18,6 +27,7 @@ export const createEmployee: RequestHandler = (req, res, next) => {
     request.salary,
     request.department
   );
+  employees.push(employee);
 
   res.status(200).json(employee);
 };
@@ -35,7 +45,7 @@ export const getEmployee: RequestHandler<{ emp_id: number }> = (
   const empIndex = getEmployeeIndex(emp_id);
 
   if (empIndex < 0) {
-    res.status(404).json(new ErrorResponse("Error: Employee not found."));
+    res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
     res.status(200).json(employees[empIndex]);
   }
@@ -50,19 +60,23 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = (
   const empIndex = getEmployeeIndex(emp_id);
 
   if (empIndex < 0) {
-    res.status(404).json(new ErrorResponse("Error: Employee not found."));
-  } else {
-    const updateRequest = req.body as EmployeeRequest;
-    const updatedEmployee = new EmployeeDef(
-      emp_id,
-      updateRequest.name,
-      updateRequest.salary,
-      updateRequest.department
-    );
+    res.status(404).json(new ErrorResponse("Employee not found."));
+    return;
+  }
 
-    updatedEmployee == employees[empIndex]
-      ? res.status(304)
-      : res.status(200).json(updatedEmployee);
+  const updateRequest = req.body as EmployeeRequest;
+  const updatedEmployee = new EmployeeDef(
+    emp_id,
+    updateRequest.name,
+    updateRequest.salary,
+    updateRequest.department
+  );
+
+  if (isSameEmployee(updatedEmployee, employees[empIndex])) {
+    res.status(304).json();
+  } else {
+    employees[empIndex] = updatedEmployee;
+    res.status(200).json(updatedEmployee);
   }
 };
 
@@ -75,7 +89,7 @@ export const deleteEmployee: RequestHandler<{ emp_id: number }> = (
   const empIndex = getEmployeeIndex(emp_id);
 
   if (empIndex < 0) {
-    res.status(404).json(new ErrorResponse("Error: Employee not found."));
+    res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
     employees.splice(empIndex, 1);
     res.status(204);
