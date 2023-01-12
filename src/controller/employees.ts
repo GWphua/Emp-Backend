@@ -13,13 +13,6 @@ export const createEmployee: RequestHandler = (req, res, next) => {
   try {
     const request = req.body as EmployeeRequest;
 
-    if (!request.isValidRequest()) {
-      res
-        .status(400)
-        .json(new ErrorResponse("Please ensure fields are entered correctly"));
-      return;
-    }
-
     const employee = new EmployeeDef(
       Math.random(),
       request.name,
@@ -76,13 +69,6 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = (
     }
 
     const updateRequest = req.body as EmployeeRequest;
-
-    if (!updateRequest.isValidRequest()) {
-      res
-        .status(400)
-        .json(new ErrorResponse("Please ensure fields are entered correctly"));
-      return;
-    }
 
     const updatedEmployee = new EmployeeDef(
       emp_id,
