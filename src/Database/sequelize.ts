@@ -1,14 +1,7 @@
 import { Sequelize } from "sequelize";
+import config from "./config/config";
 
-const sequelize = new Sequelize('employee', 'postgres','Phua0107', {
-  host: 'localhost',
-  dialect: 'postgres'
-});
+require('dotenv').config();
 
-try {
-  sequelize.authenticate().then(() =>
-    console.log("Connection has been established successfully.")
-  );
-} catch (error) {
-  console.error("Unable to connect to the database: ", error);
-}
+const dbConfig = (config as any)[process.env.NODE_ENV || ''];
+export const sequelize = new Sequelize(dbConfig);

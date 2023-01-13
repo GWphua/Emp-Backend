@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon dest/app.js"
+    "start": "set NODE_ENV=development&&cd src/Database&&npx sequelize db:migrate&&cd ../..&&tsc-watch --onSuccess \"node ./dist/src/app.js\""
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/GWphua/Training-Mavericks#readme",
   "dependencies": {
     "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "joi": "^17.7.0",
     "pg": "^8.8.0",
@@ -29,6 +30,8 @@
   "devDependencies": {
     "@types/express": "^4.17.15",
     "@types/node": "^18.11.18",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "sequelize-cli": "^6.5.2",
+    "tsc-watch": "^6.0.0"
   }
 }
