@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import config from "./config/config";
+import config from "./src/Database/config/config";
 
 require('dotenv').config();
 
