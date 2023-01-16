@@ -1,28 +1,26 @@
-require('dotenv').config();
-const {DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST} = process.env;
+require("dotenv").config();
+const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST } = process.env;
 
 module.exports = {
-  development: {
+  "development": {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
     host: DB_HOST,
-    dialect: "postgres"
+    dialect: "postgres",
   },
   test: {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
     host: DB_HOST,
-    dialect: "postgres"
+    dialect: "postgres",
   },
   production: {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
     host: DB_HOST,
-    dialect: "postgres"
-  }
-}
-
-
+    dialect: "postgres",
+  },
+};
