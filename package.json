@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "set NODE_ENV=development&&cd src/Database&&npx sequelize db:migrate&&cd ../..&&tsc-watch --onSuccess \"node ./dist/src/app.js\""
+    "start": "set NODE_ENV=development&&cd src/Database&&npx sequelize db:migrate&&cd ../..&&tsc-watch --onSuccess \"node ./dist/src/app.js\"",
   },
   "repository": {
     "type": "git",
