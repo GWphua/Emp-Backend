@@ -3,12 +3,6 @@ import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
 import { Employee } from "../model/employee";
-import { EmployeeDef } from "../model/employeeDef";
-
-const employees: EmployeeDef[] = [];
-function getEmployeeIndex(id: number): number {
-  return employees.findIndex((employee) => employee.id == id);
-}
 
 export const createEmployee: RequestHandler = async (req, res, next) => {
   const request = req.body as EmployeeRequest;
@@ -39,48 +33,45 @@ export const getEmployee: RequestHandler<{ emp_id: number }> = async (
   }
 };
 
-export const updateEmployee: RequestHandler<{ emp_id: number }> = (
+export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
   req,
   res,
   next
 ) => {
   const emp_id = req.params.emp_id;
-  const empIndex = getEmployeeIndex(emp_id);
 
-  if (empIndex < 0) {
+  const employee = await Employee.findByPk(emp_id);
+
+  if (employee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
     return;
   }
 
-  const updateRequest = req.body as EmployeeRequest;
+  const newParticulars = req.body as EmployeeRequest;
+  const oldParticulars = {
+    name: employee.name,
+    salary: employee.salary,
+    department: employee.department,
+  } as EmployeeRequest;
 
-  const updatedEmployee = new EmployeeDef(
-    emp_id,
-    updateRequest.name,
-    updateRequest.salary,
-    updateRequest.department
-  );
-
-  if (JSON.stringify(updatedEmployee) === JSON.stringify(employees[empIndex])) {
+  if (JSON.stringify(oldParticulars) === JSON.stringify(newParticulars)) {
     res.status(304).json();
   } else {
-    employees[empIndex] = updatedEmployee;
-    res.status(200).json(updatedEmployee);
+    await Employee.update(newParticulars, { where: { id: emp_id } });
+    res.status(200).json(await Employee.findByPk(emp_id));
   }
 };
 
-export const deleteEmployee: RequestHandler<{ emp_id: number }> = (
+export const deleteEmployee: RequestHandler<{ emp_id: number }> = async (
   req,
   res,
   next
 ) => {
   const emp_id = req.params.emp_id;
-  const empIndex = getEmployeeIndex(emp_id);
 
-  if (empIndex < 0) {
-    res.status(404).json(new ErrorResponse("Employee not found."));
-  } else {
-    employees.splice(empIndex, 1);
+  if ((await Employee.destroy({ where: { id: emp_id } }))) {
     res.status(204).json();
+  } else {
+    res.status(404).json(new ErrorResponse("Employee not found."));
   }
 };
