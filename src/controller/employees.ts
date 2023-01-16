@@ -1,20 +1,32 @@
 import { RequestHandler } from "express";
+import { simplifyEmployee } from "../model/employeeDef";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
-import { Employee } from "../model/employee";
+import {
+  createEmployeeData,
+  deleteEmployeeData,
+  getAllEmployeeData,
+  getEmployeeData,
+  updateEmployeeData,
+} from "../services/employeeServices";
 
 export const createEmployee: RequestHandler = async (req, res, next) => {
   const request = req.body as EmployeeRequest;
+  const createdEmployee = await createEmployeeData(
+    request.name,
+    request.salary,
+    request.department
+  );
 
-  const employee = await Employee.create(request as any);
-
-  res.status(200).json(employee);
+  res.status(200).json(simplifyEmployee(createdEmployee));
 };
 
 export const getAllEmployees: RequestHandler = async (req, res, next) => {
-  const employees = await Employee.findAll();
-  res.status(200).json(new GetAllEmployeesResponse(employees));
+  const allEmployees = (await getAllEmployeeData()).map((employee) =>
+    simplifyEmployee(employee)
+  );
+  res.status(200).json(new GetAllEmployeesResponse(allEmployees));
 };
 
 export const getEmployee: RequestHandler<{ emp_id: number }> = async (
@@ -23,13 +35,12 @@ export const getEmployee: RequestHandler<{ emp_id: number }> = async (
   next
 ) => {
   const emp_id = req.params.emp_id;
-
-  const employee = await Employee.findByPk(emp_id);
+  const employee = await getEmployeeData(emp_id);
 
   if (employee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
-    res.status(200).json(employee);
+    res.status(200).json(simplifyEmployee(employee));
   }
 };
 
@@ -39,26 +50,36 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
   next
 ) => {
   const emp_id = req.params.emp_id;
+  const employeeById = await getEmployeeData(emp_id);
 
-  const employee = await Employee.findByPk(emp_id);
-
-  if (employee == null) {
+  if (employeeById == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
     return;
   }
 
-  const newParticulars = req.body as EmployeeRequest;
-  const oldParticulars = {
-    name: employee.name,
-    salary: employee.salary,
-    department: employee.department,
-  } as EmployeeRequest;
+  const request = req.body as EmployeeRequest;
 
-  if (JSON.stringify(oldParticulars) === JSON.stringify(newParticulars)) {
+  const oldEmployee = simplifyEmployee(employeeById);
+  const newEmployee = await updateEmployeeData(
+    emp_id,
+    request.name,
+    request.salary,
+    request.department
+  ).then((employee) => (employee == null ? null : simplifyEmployee(employee)));
+
+  if (JSON.stringify(oldEmployee) === JSON.stringify(newEmployee)) {
     res.status(304).json();
   } else {
-    await Employee.update(newParticulars, { where: { id: emp_id } });
-    res.status(200).json(await Employee.findByPk(emp_id));
+    if (newEmployee != null) {
+      res.status(200).json({
+        id: emp_id,
+        name: newEmployee.name,
+        salary: newEmployee.salary,
+        department: newEmployee.department,
+      });
+    } else {
+      res.status(404).json(new ErrorResponse("Employee not found."));
+    }
   }
 };
 
@@ -69,7 +90,7 @@ export const deleteEmployee: RequestHandler<{ emp_id: number }> = async (
 ) => {
   const emp_id = req.params.emp_id;
 
-  if ((await Employee.destroy({ where: { id: emp_id } }))) {
+  if (await deleteEmployeeData(emp_id)) {
     res.status(204).json();
   } else {
     res.status(404).json(new ErrorResponse("Employee not found."));

@@ -1,5 +1,5 @@
-import { Employee } from "./employee";
+import { EmployeeDef } from "./employeeDef";
 
 export class GetAllEmployeesResponse {
-  constructor(public employees: Employee[]) {}
+  constructor(public employees: EmployeeDef[]) {}
 }
