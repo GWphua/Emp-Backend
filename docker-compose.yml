@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  express:
+    container_name: emp_api
+    image: emp_api:0.0.1
+    build: .
+    restart: always
+    networks:
+      - employeeAPI
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/usr/app
+      # - hostPath:containerPath:ro
+    depends_on:
+      - db
+
+  db:
+    container_name: emp_api_db
+    image: "postgres:14"
+    ports:
+     - 5433:5432 # Use port 5433 on my PC to connect to Dockerized DB
+    networks:
+      - employeeAPI
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=employee
+      - POSTGRES_USER=${DB_USERNAME}
+    volumes:
+      - emp_data:/data/db
+
+volumes:
+  emp_data: {}
+
+networks:
+  employeeAPI: {}

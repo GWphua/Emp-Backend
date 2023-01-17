@@ -6,7 +6,7 @@ module.exports = {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_NAME,
-    host: DB_HOST,
+    host: "emp_api_db",
     dialect: "postgres",
   },
   test: {
