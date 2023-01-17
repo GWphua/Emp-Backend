@@ -1,89 +1,98 @@
 import { RequestHandler } from "express";
-import { EmployeeDef } from "../model/employeeDef";
+import { simplifyEmployee } from "../model/employeeDef";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
+import {
+  createEmployeeData,
+  deleteEmployeeData,
+  getAllEmployeeData,
+  getEmployeeData,
+  updateEmployeeData,
+} from "../services/employeeServices";
 
-const employees: EmployeeDef[] = [];
-function getEmployeeIndex(id: number): number {
-  return employees.findIndex((employee) => employee.id == id);
-}
-
-export const createEmployee: RequestHandler = (req, res, next) => {
+export const createEmployee: RequestHandler = async (req, res, next) => {
   const request = req.body as EmployeeRequest;
-
-  const employee = new EmployeeDef(
-    Math.random(),
+  const createdEmployee = await createEmployeeData(
     request.name,
     request.salary,
     request.department
   );
-  employees.push(employee);
 
-  res.status(200).json(employee);
+  res.status(200).json(simplifyEmployee(createdEmployee));
 };
 
-export const getAllEmployees: RequestHandler = (req, res, next) => {
-  res.status(200).json(new GetAllEmployeesResponse(employees));
+export const getAllEmployees: RequestHandler = async (req, res, next) => {
+  const allEmployees = (await getAllEmployeeData()).map((employee) =>
+    simplifyEmployee(employee)
+  );
+  res.status(200).json(new GetAllEmployeesResponse(allEmployees));
 };
 
-export const getEmployee: RequestHandler<{ emp_id: number }> = (
+export const getEmployee: RequestHandler<{ emp_id: number }> = async (
   req,
   res,
   next
 ) => {
   const emp_id = req.params.emp_id;
-  const empIndex = getEmployeeIndex(emp_id);
+  const employee = await getEmployeeData(emp_id);
 
-  if (empIndex < 0) {
+  if (employee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
-    res.status(200).json(employees[empIndex]);
+    res.status(200).json(simplifyEmployee(employee));
   }
 };
 
-export const updateEmployee: RequestHandler<{ emp_id: number }> = (
+export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
   req,
   res,
   next
 ) => {
   const emp_id = req.params.emp_id;
-  const empIndex = getEmployeeIndex(emp_id);
+  const employeeById = await getEmployeeData(emp_id);
 
-  if (empIndex < 0) {
+  if (employeeById == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
     return;
   }
 
-  const updateRequest = req.body as EmployeeRequest;
+  const request = req.body as EmployeeRequest;
 
-  const updatedEmployee = new EmployeeDef(
+  const oldEmployee = simplifyEmployee(employeeById);
+  const newEmployee = await updateEmployeeData(
     emp_id,
-    updateRequest.name,
-    updateRequest.salary,
-    updateRequest.department
-  );
+    request.name,
+    request.salary,
+    request.department
+  ).then((employee) => (employee == null ? null : simplifyEmployee(employee)));
 
-  if (JSON.stringify(updatedEmployee) === JSON.stringify(employees[empIndex])) {
+  if (JSON.stringify(oldEmployee) === JSON.stringify(newEmployee)) {
     res.status(304).json();
   } else {
-    employees[empIndex] = updatedEmployee;
-    res.status(200).json(updatedEmployee);
+    if (newEmployee != null) {
+      res.status(200).json({
+        id: emp_id,
+        name: newEmployee.name,
+        salary: newEmployee.salary,
+        department: newEmployee.department,
+      });
+    } else {
+      res.status(404).json(new ErrorResponse("Employee not found."));
+    }
   }
 };
 
-export const deleteEmployee: RequestHandler<{ emp_id: number }> = (
+export const deleteEmployee: RequestHandler<{ emp_id: number }> = async (
   req,
   res,
   next
 ) => {
   const emp_id = req.params.emp_id;
-  const empIndex = getEmployeeIndex(emp_id);
 
-  if (empIndex < 0) {
-    res.status(404).json(new ErrorResponse("Employee not found."));
-  } else {
-    employees.splice(empIndex, 1);
+  if (await deleteEmployeeData(emp_id)) {
     res.status(204).json();
+  } else {
+    res.status(404).json(new ErrorResponse("Employee not found."));
   }
 };

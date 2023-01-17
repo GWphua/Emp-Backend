@@ -1,6 +1,8 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
 import employeeRouter from './routes/employees'
 import { json } from 'body-parser';
+import { Sequelize } from 'sequelize';
+import { sequelize } from '../sequelize';
 
 const app = express();
 
@@ -12,6 +14,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({message:err.message});
 });
 
-app.listen(3000, () => {
+app.listen(3000, async () => {
   console.log("Application listening at http://localhost:3000");
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database: ', error);
+  }
 });

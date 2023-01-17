@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import Joi from "joi";
 import { ErrorResponse } from "../model/errorResponse";
 
-export const validityHandler: RequestHandler<any> = (req, res, next) => {
+export const validateEmployeeRequest: RequestHandler<any> = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().required(),
     salary: Joi.number().integer().strict().required(),
