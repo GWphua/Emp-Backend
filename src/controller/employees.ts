@@ -29,12 +29,12 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
   res.status(200).json(new GetAllEmployeesResponse(allEmployees));
 };
 
-export const getEmployee: RequestHandler<{ emp_id: number }> = async (
+export const getEmployee: RequestHandler<{ emp_id: string }> = async (
   req,
   res,
   next
 ) => {
-  const emp_id = req.params.emp_id;
+  const emp_id = +req.params.emp_id;
   const employee = await getEmployeeData(emp_id);
 
   if (employee == null) {
@@ -44,12 +44,12 @@ export const getEmployee: RequestHandler<{ emp_id: number }> = async (
   }
 };
 
-export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
+export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
   req,
   res,
   next
 ) => {
-  const emp_id = req.params.emp_id;
+  const emp_id = +req.params.emp_id;
   const employeeById = await getEmployeeData(emp_id);
 
   if (employeeById == null) {
@@ -67,7 +67,10 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
     request.department
   ).then((employee) => (employee == null ? null : simplifyEmployee(employee)));
 
-  if (JSON.stringify(oldEmployee) === JSON.stringify(newEmployee)) {
+  console.log(oldEmployee);
+  console.log(newEmployee);
+
+  if (JSON.stringify(oldEmployee) == JSON.stringify(newEmployee)) {
     res.status(304).json();
   } else {
     if (newEmployee != null) {
@@ -83,12 +86,12 @@ export const updateEmployee: RequestHandler<{ emp_id: number }> = async (
   }
 };
 
-export const deleteEmployee: RequestHandler<{ emp_id: number }> = async (
+export const deleteEmployee: RequestHandler<{ emp_id: string }> = async (
   req,
   res,
   next
 ) => {
-  const emp_id = req.params.emp_id;
+  const emp_id = +req.params.emp_id;
 
   if (await deleteEmployeeData(emp_id)) {
     res.status(204).json();
