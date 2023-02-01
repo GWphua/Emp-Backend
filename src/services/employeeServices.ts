@@ -10,7 +10,7 @@ export async function createEmployeeData(
 }
 
 export async function getAllEmployeeData(): Promise<Employee[]> {
-  return await Employee.findAll();
+  return await Employee.findAll({ order: [["id", "ASC"]] });
 }
 
 export async function getEmployeeData(
