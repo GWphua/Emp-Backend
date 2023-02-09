@@ -1,9 +1,11 @@
-import { Employee } from "../model/employee";
+import { Employee } from "../../models/employee";
+import { Department } from "../../models/department";
+import { DepartmentType } from "../model/departmentDef";
 
 export async function createEmployeeData(
   name: string,
   salary: number,
-  department: "HR" | "PS"
+  department: DepartmentType
 ): Promise<Employee> {
   const payload = { name: name, salary: salary, department: department };
   return await Employee.create(payload);
@@ -11,6 +13,10 @@ export async function createEmployeeData(
 
 export async function getAllEmployeeData(): Promise<Employee[]> {
   return await Employee.findAll({ order: [["id", "ASC"]] });
+}
+
+export async function getAllDepartmentData(): Promise<Department[]> {
+  return await Department.findAll({ order: [["id", "ASC"]] });
 }
 
 export async function getEmployeeData(
@@ -23,7 +29,7 @@ export async function updateEmployeeData(
   emp_id: number,
   name: string,
   salary: number,
-  department: "HR" | "PS"
+  department: DepartmentType
 ): Promise<Employee | null> {
   const isUpdated = await Employee.update(
     { name, salary, department },

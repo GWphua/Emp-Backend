@@ -10,7 +10,7 @@ export const validateEmployeeRequest: RequestHandler<any> = (
   const schema = Joi.object({
     name: Joi.string().required(),
     salary: Joi.number().integer().strict().required(),
-    department: Joi.string().valid("PS", "HR").required(),
+    department: Joi.string().valid("PS", "HR", "ADMIN").required(),
   });
 
   const value = schema.validate(req.body);

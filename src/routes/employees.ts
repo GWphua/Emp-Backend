@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createEmployee,
   deleteEmployee,
+  getAllDepartments,
   getAllEmployees,
   getEmployee,
   updateEmployee,
@@ -14,14 +15,18 @@ import {
 const router = Router();
 
 router.get("/", getAllEmployees);
+router.get("/department", getAllDepartments);
 router.get("/:emp_id", validateEmployeeId, getEmployee);
+
 router.post("/", validateEmployeeRequest, createEmployee);
+
 router.put(
   "/:emp_id",
   validateEmployeeId,
   validateEmployeeRequest,
   updateEmployee
 );
+
 router.delete("/:emp_id", validateEmployeeId, deleteEmployee);
 
 export default router;

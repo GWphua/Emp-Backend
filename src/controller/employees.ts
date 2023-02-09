@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { simplifyDepartment } from "../model/departmentDef";
 import { simplifyEmployee } from "../model/employeeDef";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
@@ -6,6 +7,7 @@ import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
 import {
   createEmployeeData,
   deleteEmployeeData,
+  getAllDepartmentData,
   getAllEmployeeData,
   getEmployeeData,
   updateEmployeeData,
@@ -27,6 +29,14 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
     simplifyEmployee(employee)
   );
   res.status(200).json(new GetAllEmployeesResponse(allEmployees));
+};
+
+export const getAllDepartments: RequestHandler = async (req, res, next) => {
+  const allDepartments = (await getAllDepartmentData()).map((department) =>
+    simplifyDepartment(department)
+  );
+  
+  res.status(200).json(allDepartments);
 };
 
 export const getEmployee: RequestHandler<{ emp_id: string }> = async (
@@ -73,15 +83,15 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
   if (JSON.stringify(oldEmployee) == JSON.stringify(newEmployee)) {
     res.status(304).json();
   } else {
-    if (newEmployee != null) {
+    if (newEmployee == null) {
+      res.status(404).json(new ErrorResponse("Employee not found."));
+    } else {
       res.status(200).json({
         id: emp_id,
         name: newEmployee.name,
         salary: newEmployee.salary,
         department: newEmployee.department,
       });
-    } else {
-      res.status(404).json(new ErrorResponse("Employee not found."));
     }
   }
 };
