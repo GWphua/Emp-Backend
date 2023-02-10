@@ -9,7 +9,7 @@ import {
   deleteEmployeeData,
   getAllEmployeeData,
   getEmployeeData,
-  updateEmployeeData
+  updateEmployeeData,
 } from "../services/employeeServices";
 
 export const createEmployee: RequestHandler = async (req, res, next) => {
@@ -24,16 +24,17 @@ export const createEmployee: RequestHandler = async (req, res, next) => {
     res
       .status(400)
       .json(new ErrorResponse("Employee Details are entered incorrectly."));
-  } else {
-    const employeeDef = await employeeWithDepartment(createdEmployee);
+    return;
+  }
 
-    if (employeeDef == null) {
-      res
-        .status(400)
-        .json(new ErrorResponse("Employee Details are entered incorrectly."));
-    } else {
-      res.status(200).json(employeeDef);
-    }
+  const employeeDef = await employeeWithDepartment(createdEmployee);
+
+  if (employeeDef == null) {
+    res
+      .status(400)
+      .json(new ErrorResponse("Employee Details are entered incorrectly."));
+  } else {
+    res.status(200).json(employeeDef);
   }
 };
 
@@ -47,7 +48,6 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
     )
   );
 
-  console.log(employees);
   res.status(200).json(new GetAllEmployeesResponse(employees));
 };
 

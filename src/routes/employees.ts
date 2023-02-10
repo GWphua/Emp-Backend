@@ -7,7 +7,7 @@ import {
   getEmployee,
   updateEmployee
 } from "../controller/employees";
-import { getAllUsers } from "../controller/users";
+import { createUser, getAllUsers } from "../controller/users";
 import {
   validateEmployeeId,
   validateEmployeeRequest
@@ -21,6 +21,7 @@ router.get("/users", getAllUsers);
 router.get("/:emp_id", validateEmployeeId, getEmployee);
 
 router.post("/", validateEmployeeRequest, createEmployee);
+router.post("/users", createUser);
 
 router.put(
   "/:emp_id",

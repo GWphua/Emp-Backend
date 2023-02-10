@@ -1,7 +1,9 @@
 import { Department } from "../../models/department";
 import { Employee } from "../../models/employee";
+import { User } from "../../models/user";
 import { DepartmentType } from "../model/departmentDef";
 import { EmployeeDef } from "../model/employeeDef";
+import { UserDef } from "../model/userDef";
 
 export async function getAllDepartmentData(): Promise<Department[]> {
   return await Department.findAll({ order: [["id", "ASC"]] });
@@ -65,4 +67,31 @@ export async function employeeWithDepartment(
     employee.salary,
     department
   );
+}
+
+export async function userWithDepartmentId(
+  user: UserDef
+): Promise<User | null> {
+  const department_id = await getDepartmentId(user.department);
+
+  if (department_id == null) {
+    return null;
+  }
+
+  return {
+    username: user.username,
+    password: user.password,
+
+    department_id: department_id,
+  } as User;
+}
+
+export async function userWithDepartment(user: User): Promise<UserDef | null> {
+  const department = await getDepartment(user.department_id);
+
+  if (department == null) {
+    return null;
+  }
+
+  return new UserDef(user.username, user.password, department);
 }
