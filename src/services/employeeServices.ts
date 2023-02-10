@@ -45,13 +45,7 @@ export async function updateEmployeeData(
   );
 
   if (isUpdated) {
-    const updatedEmployee = {
-      id: emp_id,
-      name: name,
-      salary: salary,
-      department_id: department_id,
-    } as Employee;
-
+    const updatedEmployee = (await getEmployeeData(emp_id))!;
     return updatedEmployee;
   } else {
     return null;

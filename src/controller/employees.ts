@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { Employee } from "../../models/employee";
-import { EmployeeDef } from "../model/employeeDef";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
@@ -85,35 +84,34 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
   next
 ) => {
   const emp_id = +req.params.emp_id;
-  const employeeById = await getEmployeeData(emp_id);
+  const oldEmployee = await getEmployeeData(emp_id);
 
-  if (employeeById == null) {
+  if (oldEmployee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
     return;
   }
 
   const request = req.body as EmployeeRequest;
 
-  const oldEmployee = (await employeeWithDepartment(employeeById))!;
-
   const newEmployee = await updateEmployeeData(
     emp_id,
     request.name,
     request.salary,
     request.department
-  ).then(async (employee) =>
-    employee == null ? null : (await employeeWithDepartment(employeeById))!
   );
-
-  console.log(oldEmployee);
-  console.log(newEmployee);
 
   if (newEmployee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
-  } else if (JSON.stringify(oldEmployee) == JSON.stringify(newEmployee)) {
+    return;
+  }
+
+  const oldEmployeeDef = (await employeeWithDepartment(oldEmployee))!;
+  const newEmployeeDef = (await employeeWithDepartment(newEmployee))!;
+
+  if (JSON.stringify(oldEmployeeDef) == JSON.stringify(newEmployeeDef)) {
     res.status(304).json();
   } else {
-    res.status(200).json(newEmployee);
+    res.status(200).json(newEmployeeDef);
   }
 };
 
