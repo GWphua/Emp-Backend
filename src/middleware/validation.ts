@@ -1,16 +1,22 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
 import { ErrorResponse } from "../model/errorResponse";
+import { getAllDepartment } from "../services/departmentService";
 
-export const validateEmployeeRequest: RequestHandler<any> = (
+export const validateEmployeeRequest: RequestHandler<any> = async (
   req,
   res,
   next
 ) => {
+  const departments = await getAllDepartment();
+  console.log(departments);
+
   const schema = Joi.object({
     name: Joi.string().required(),
     salary: Joi.number().integer().strict().required(),
-    department: Joi.string().valid("PS", "HR", "ADMIN").required(),
+    department: Joi.string()
+      .valid(...departments)
+      .required(),
   });
 
   const value = schema.validate(req.body);
