@@ -1,21 +1,23 @@
 import { Router } from "express";
+import { getAllDepartments } from "../controller/departments";
 import {
   createEmployee,
   deleteEmployee,
-  getAllDepartments,
   getAllEmployees,
   getEmployee,
-  updateEmployee,
+  updateEmployee
 } from "../controller/employees";
+import { getAllUsers } from "../controller/users";
 import {
   validateEmployeeId,
-  validateEmployeeRequest,
+  validateEmployeeRequest
 } from "../middleware/validation";
 
 const router = Router();
 
 router.get("/", getAllEmployees);
 router.get("/department", getAllDepartments);
+router.get("/users", getAllUsers);
 router.get("/:emp_id", validateEmployeeId, getEmployee);
 
 router.post("/", validateEmployeeRequest, createEmployee);

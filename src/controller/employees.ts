@@ -3,16 +3,13 @@ import { Employee } from "../../models/employee";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
-import {
-  employeeWithDepartment,
-  getAllDepartment,
-} from "../services/departmentService";
+import { employeeWithDepartment } from "../services/departmentService";
 import {
   createEmployeeData,
   deleteEmployeeData,
   getAllEmployeeData,
   getEmployeeData,
-  updateEmployeeData,
+  updateEmployeeData
 } from "../services/employeeServices";
 
 export const createEmployee: RequestHandler = async (req, res, next) => {
@@ -52,10 +49,6 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
 
   console.log(employees);
   res.status(200).json(new GetAllEmployeesResponse(employees));
-};
-
-export const getAllDepartments: RequestHandler = async (req, res, next) => {
-  res.status(200).json(await getAllDepartment());
 };
 
 export const getEmployee: RequestHandler<{ emp_id: string }> = async (

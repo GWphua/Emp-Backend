@@ -1,6 +1,5 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../sequelize";
-import { DepartmentType } from "../src/model/departmentDef";
 
 export class Employee extends Model {
   declare id: number;
