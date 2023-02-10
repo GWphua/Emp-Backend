@@ -1,22 +1,24 @@
 import { Employee } from "../../models/employee";
-import { Department } from "../../models/department";
 import { DepartmentType } from "../model/departmentDef";
+import { getDepartmentId } from "./departmentService";
 
 export async function createEmployeeData(
   name: string,
   salary: number,
   department: DepartmentType
-): Promise<Employee> {
-  const payload = { name: name, salary: salary, department: department };
+): Promise<Employee | null> {
+  const department_id = await getDepartmentId(department);
+  if (department_id == null) {
+    // Or Assert non-null.
+    return null;
+  }
+
+  const payload = { name: name, salary: salary, department_id: department_id };
   return await Employee.create(payload);
 }
 
 export async function getAllEmployeeData(): Promise<Employee[]> {
   return await Employee.findAll({ order: [["id", "ASC"]] });
-}
-
-export async function getAllDepartmentData(): Promise<Department[]> {
-  return await Department.findAll({ order: [["id", "ASC"]] });
 }
 
 export async function getEmployeeData(
@@ -31,8 +33,14 @@ export async function updateEmployeeData(
   salary: number,
   department: DepartmentType
 ): Promise<Employee | null> {
+  const department_id = await getDepartmentId(department);
+
+  if (department_id == null) {
+    return null;
+  }
+
   const isUpdated = await Employee.update(
-    { name, salary, department },
+    { name, salary, department_id },
     { where: { id: emp_id } }
   );
 
@@ -41,7 +49,7 @@ export async function updateEmployeeData(
       id: emp_id,
       name: name,
       salary: salary,
-      department: department,
+      department_id: department_id,
     } as Employee;
 
     return updatedEmployee;

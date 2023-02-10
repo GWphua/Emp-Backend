@@ -9,7 +9,6 @@ export const validateEmployeeRequest: RequestHandler<any> = async (
   next
 ) => {
   const departments = await getAllDepartment();
-  console.log(departments);
 
   const schema = Joi.object({
     name: Joi.string().required(),

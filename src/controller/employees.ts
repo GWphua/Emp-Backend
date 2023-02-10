@@ -1,13 +1,16 @@
 import { RequestHandler } from "express";
-import { simplifyDepartment } from "../model/departmentDef";
-import { simplifyEmployee } from "../model/employeeDef";
+import { Employee } from "../../models/employee";
+import { EmployeeDef } from "../model/employeeDef";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
 import {
+  employeeWithDepartment,
+  getAllDepartment,
+} from "../services/departmentService";
+import {
   createEmployeeData,
   deleteEmployeeData,
-  getAllDepartmentData,
   getAllEmployeeData,
   getEmployeeData,
   updateEmployeeData,
@@ -21,22 +24,39 @@ export const createEmployee: RequestHandler = async (req, res, next) => {
     request.department
   );
 
-  res.status(200).json(simplifyEmployee(createdEmployee));
+  if (createdEmployee == null) {
+    res
+      .status(400)
+      .json(new ErrorResponse("Employee Details are entered incorrectly."));
+  } else {
+    const employeeDef = await employeeWithDepartment(createdEmployee);
+
+    if (employeeDef == null) {
+      res
+        .status(400)
+        .json(new ErrorResponse("Employee Details are entered incorrectly."));
+    } else {
+      res.status(200).json(employeeDef);
+    }
+  }
 };
 
 export const getAllEmployees: RequestHandler = async (req, res, next) => {
-  const allEmployees = (await getAllEmployeeData()).map((employee) =>
-    simplifyEmployee(employee)
+  const databaseEmployees: Employee[] = await getAllEmployeeData();
+
+  const employees = await Promise.all(
+    databaseEmployees.map(
+      async (databaseEmployee) =>
+        (await employeeWithDepartment(databaseEmployee))!
+    )
   );
-  res.status(200).json(new GetAllEmployeesResponse(allEmployees));
+
+  console.log(employees);
+  res.status(200).json(new GetAllEmployeesResponse(employees));
 };
 
 export const getAllDepartments: RequestHandler = async (req, res, next) => {
-  const allDepartments = (await getAllDepartmentData()).map((department) =>
-    simplifyDepartment(department)
-  );
-  
-  res.status(200).json(allDepartments);
+  res.status(200).json(await getAllDepartment());
 };
 
 export const getEmployee: RequestHandler<{ emp_id: string }> = async (
@@ -50,7 +70,12 @@ export const getEmployee: RequestHandler<{ emp_id: string }> = async (
   if (employee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
   } else {
-    res.status(200).json(simplifyEmployee(employee));
+    const employeeDef = await employeeWithDepartment(employee);
+    if (employeeDef == null) {
+      res.status(404).json(new ErrorResponse("Department not found."));
+    } else {
+      res.status(200).json(employeeDef);
+    }
   }
 };
 
@@ -69,30 +94,26 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
 
   const request = req.body as EmployeeRequest;
 
-  const oldEmployee = simplifyEmployee(employeeById);
+  const oldEmployee = (await employeeWithDepartment(employeeById))!;
+
   const newEmployee = await updateEmployeeData(
     emp_id,
     request.name,
     request.salary,
     request.department
-  ).then((employee) => (employee == null ? null : simplifyEmployee(employee)));
+  ).then(async (employee) =>
+    employee == null ? null : (await employeeWithDepartment(employeeById))!
+  );
 
   console.log(oldEmployee);
   console.log(newEmployee);
 
-  if (JSON.stringify(oldEmployee) == JSON.stringify(newEmployee)) {
+  if (newEmployee == null) {
+    res.status(404).json(new ErrorResponse("Employee not found."));
+  } else if (JSON.stringify(oldEmployee) == JSON.stringify(newEmployee)) {
     res.status(304).json();
   } else {
-    if (newEmployee == null) {
-      res.status(404).json(new ErrorResponse("Employee not found."));
-    } else {
-      res.status(200).json({
-        id: emp_id,
-        name: newEmployee.name,
-        salary: newEmployee.salary,
-        department: newEmployee.department,
-      });
-    }
+    res.status(200).json(newEmployee);
   }
 };
 
