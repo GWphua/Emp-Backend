@@ -1,8 +1,9 @@
+import bcrypt from "bcryptjs";
 import { RequestHandler } from "express";
 import { ErrorResponse } from "../model/errorResponse";
 import { UserRequest } from "../model/userRequest";
 import { userWithDepartment } from "../services/departmentService";
-import { createUserData, getAllUserData } from "../services/userService";
+import { createUserData, existingUserWithUsername, getAllUserData } from "../services/userService";
 
 export const getAllUsers: RequestHandler = async (req, res, next) => {
   const databaseUsers = await getAllUserData();
@@ -17,17 +18,23 @@ export const getAllUsers: RequestHandler = async (req, res, next) => {
 };
 
 export const createUser: RequestHandler = async (req, res, next) => {
-  const request = req.body as UserRequest;
-  const createdUser = await createUserData(
-    request.username,
-    request.password,
-    request.department
-  );
+  const userData = req.body as UserRequest;
 
-  if (createdUser == null) {
-    res.status(400).json(new ErrorResponse("User Details are invalid."));
+  const hashedPassword = await bcrypt.hash(userData.password, 12);
+  console.log(hashedPassword);
+
+  // Check if user is already in database, and throw error.
+  const userWithSameUsername = await existingUserWithUsername(userData.username);
+  if (userWithSameUsername != null) {
+    res.status(400).json(new ErrorResponse("Username already exists."));
     return;
   }
+
+  const createdUser = await createUserData(
+    userData.username,
+    hashedPassword,
+    userData.department
+  );
 
   const userDef = await userWithDepartment(createdUser);
 

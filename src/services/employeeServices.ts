@@ -6,12 +6,8 @@ export async function createEmployeeData(
   name: string,
   salary: number,
   department: DepartmentType
-): Promise<Employee | null> {
+): Promise<Employee> {
   const department_id = await getDepartmentId(department);
-  if (department_id == null) {
-    // Or Assert non-null.
-    return null;
-  }
 
   const payload = { name: name, salary: salary, department_id: department_id };
   return await Employee.create(payload);
@@ -34,10 +30,6 @@ export async function updateEmployeeData(
   department: DepartmentType
 ): Promise<Employee | null> {
   const department_id = await getDepartmentId(department);
-
-  if (department_id == null) {
-    return null;
-  }
 
   const isUpdated = await Employee.update(
     { name, salary, department_id },

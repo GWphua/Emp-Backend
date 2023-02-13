@@ -20,22 +20,8 @@ export const createEmployee: RequestHandler = async (req, res, next) => {
     request.department
   );
 
-  if (createdEmployee == null) {
-    res
-      .status(400)
-      .json(new ErrorResponse("Employee Details are entered incorrectly."));
-    return;
-  }
-
   const employeeDef = await employeeWithDepartment(createdEmployee);
-
-  if (employeeDef == null) {
-    res
-      .status(400)
-      .json(new ErrorResponse("Employee Details are entered incorrectly."));
-  } else {
-    res.status(200).json(employeeDef);
-  }
+  res.status(200).json(employeeDef);
 };
 
 export const getAllEmployees: RequestHandler = async (req, res, next) => {

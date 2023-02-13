@@ -9,6 +9,7 @@ export const validateEmployeeRequest: RequestHandler<any> = async (
   next
 ) => {
   const departments = await getAllDepartment();
+  console.log(departments);
 
   const schema = Joi.object({
     name: Joi.string().required(),
@@ -22,7 +23,7 @@ export const validateEmployeeRequest: RequestHandler<any> = async (
   if (value.error) {
     res
       .status(400)
-      .json(new ErrorResponse("Please ensure fields are entered correctly"));
+      .json(new ErrorResponse("Please ensure input department exists!"));
   } else {
     next();
   }
@@ -42,7 +43,7 @@ export const validateEmployeeId: RequestHandler<{ emp_id: string }> = (
       .status(400)
       .json(
         new ErrorResponse(
-          "Please ensure request parameters are entered correctly"
+          "Please ensure input Employee ID is a positive number!"
         )
       );
   } else {

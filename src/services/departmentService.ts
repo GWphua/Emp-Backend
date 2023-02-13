@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Department } from "../../models/department";
 import { Employee } from "../../models/employee";
 import { User } from "../../models/user";
@@ -19,30 +20,30 @@ export async function getAllDepartment(): Promise<DepartmentType[]> {
 
 export async function getDepartmentId(
   department: DepartmentType
-): Promise<number | null> {
+): Promise<number> {
   const departmentRow = await Department.findOne({
     where: { department: department },
   });
 
-  return departmentRow == null ? null : departmentRow.id;
+  assert(departmentRow != null);
+
+  return departmentRow.id;
 }
 
 export async function getDepartment(
   department_id: number
-): Promise<DepartmentType | null> {
+): Promise<DepartmentType> {
   const departmentRow = await Department.findByPk(department_id);
+  
+  assert(departmentRow != null);
 
-  return departmentRow == null ? null : departmentRow.department;
+  return departmentRow.department;
 }
 
 export async function employeeWithDepartmentId(
   employee: EmployeeDef
-): Promise<Employee | null> {
+): Promise<Employee> {
   const department_id = await getDepartmentId(employee.department);
-
-  if (department_id == null) {
-    return null;
-  }
 
   return {
     id: employee.id,
@@ -54,12 +55,8 @@ export async function employeeWithDepartmentId(
 
 export async function employeeWithDepartment(
   employee: Employee
-): Promise<EmployeeDef | null> {
+): Promise<EmployeeDef> {
   const department = await getDepartment(employee.department_id);
-
-  if (department == null) {
-    return null;
-  }
 
   return new EmployeeDef(
     employee.id,
@@ -69,29 +66,18 @@ export async function employeeWithDepartment(
   );
 }
 
-export async function userWithDepartmentId(
-  user: UserDef
-): Promise<User | null> {
+export async function userWithDepartmentId(user: UserDef): Promise<User> {
   const department_id = await getDepartmentId(user.department);
-
-  if (department_id == null) {
-    return null;
-  }
 
   return {
     username: user.username,
     password: user.password,
-
     department_id: department_id,
   } as User;
 }
 
-export async function userWithDepartment(user: User): Promise<UserDef | null> {
+export async function userWithDepartment(user: User): Promise<UserDef> {
   const department = await getDepartment(user.department_id);
-
-  if (department == null) {
-    return null;
-  }
 
   return new UserDef(user.username, user.password, department);
 }
