@@ -1,15 +1,28 @@
-import express, { NextFunction, Request, Response, Router } from "express";
-import employeeRouter from "./routes/employees";
 import { json } from "body-parser";
+import express, { NextFunction, Request, Response } from "express";
+import employeeRouter from "./routes/employees";
+import cors from 'cors';
+import session from "express-session";
 import { sequelize } from "../sequelize";
-
-var cors = require("cors");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 const app = express();
 
 app.use(cors());
 
 app.use(json());
+
+app.use(
+  session({
+    // Used internally for securing the session, and also making sure the session cannot be faked.
+    secret: "secret-key",
+    resave: false,
+    saveUninitialized: false,
+    store: new SequelizeStore({
+      db: sequelize,
+    })
+  })
+);
 
 app.use("/employee", employeeRouter);
 

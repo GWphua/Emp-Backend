@@ -30,7 +30,7 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
   const employees = await Promise.all(
     databaseEmployees.map(
       async (databaseEmployee) =>
-        (await employeeWithDepartment(databaseEmployee))!
+        await employeeWithDepartment(databaseEmployee)
     )
   );
 
@@ -47,14 +47,11 @@ export const getEmployee: RequestHandler<{ emp_id: string }> = async (
 
   if (employee == null) {
     res.status(404).json(new ErrorResponse("Employee not found."));
-  } else {
-    const employeeDef = await employeeWithDepartment(employee);
-    if (employeeDef == null) {
-      res.status(404).json(new ErrorResponse("Department not found."));
-    } else {
-      res.status(200).json(employeeDef);
-    }
+    return;
   }
+
+  const employeeDef = await employeeWithDepartment(employee);
+  res.status(200).json(employeeDef);
 };
 
 export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
@@ -84,8 +81,8 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
     return;
   }
 
-  const oldEmployeeDef = (await employeeWithDepartment(oldEmployee))!;
-  const newEmployeeDef = (await employeeWithDepartment(newEmployee))!;
+  const oldEmployeeDef = await employeeWithDepartment(oldEmployee);
+  const newEmployeeDef = await employeeWithDepartment(newEmployee);
 
   if (JSON.stringify(oldEmployeeDef) == JSON.stringify(newEmployeeDef)) {
     res.status(304).json();
