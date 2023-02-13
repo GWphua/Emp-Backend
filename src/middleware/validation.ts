@@ -10,6 +10,7 @@ export const validateEmployeeRequest: RequestHandler<any> = async (
 ) => {
   const departments = await getAllDepartment();
   console.log(departments);
+  console.log(req.body);
 
   const schema = Joi.object({
     name: Joi.string().required(),
@@ -23,7 +24,9 @@ export const validateEmployeeRequest: RequestHandler<any> = async (
   if (value.error) {
     res
       .status(400)
-      .json(new ErrorResponse("Please ensure input department exists!"));
+      .json(
+        new ErrorResponse("Please ensure input employee fields are correct.")
+      );
   } else {
     next();
   }
