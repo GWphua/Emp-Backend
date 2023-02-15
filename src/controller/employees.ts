@@ -3,11 +3,13 @@ import { Employee } from "../../models/employee";
 import { EmployeeRequest } from "../model/employeeRequest";
 import { ErrorResponse } from "../model/errorResponse";
 import { GetAllEmployeesResponse } from "../model/getAllEmployeesResponse";
+import { UserRequest } from "../model/RequestHandlerTypes";
 import { employeeWithDepartment } from "../services/departmentService";
 import {
   createEmployeeData,
   deleteEmployeeData,
   getAllEmployeeData,
+  getAllEmployeeInDepartment,
   getEmployeeData,
   updateEmployeeData,
 } from "../services/employeeServices";
@@ -24,13 +26,26 @@ export const createEmployee: RequestHandler = async (req, res, next) => {
   res.status(200).json(employeeDef);
 };
 
-export const getAllEmployees: RequestHandler = async (req, res, next) => {
-  const databaseEmployees: Employee[] = await getAllEmployeeData();
+export const getAllEmployees: RequestHandler = async (
+  req: UserRequest,
+  res,
+  next
+) => {
+  console.log(req.user);
+  if (req.user == undefined) {
+    return res.status(400).json(new ErrorResponse("Error with JWT Token"));
+  }
+
+  let databaseEmployees!: Employee[];
+  if (req.user.department === "ADMIN") {
+    databaseEmployees = await getAllEmployeeData();
+  } else {
+    databaseEmployees = await getAllEmployeeInDepartment(req.user!.department);
+  }
 
   const employees = await Promise.all(
     databaseEmployees.map(
-      async (databaseEmployee) =>
-        await employeeWithDepartment(databaseEmployee)
+      async (databaseEmployee) => await employeeWithDepartment(databaseEmployee)
     )
   );
 
@@ -38,20 +53,33 @@ export const getAllEmployees: RequestHandler = async (req, res, next) => {
 };
 
 export const getEmployee: RequestHandler<{ emp_id: string }> = async (
-  req,
+  req: UserRequest,
   res,
   next
 ) => {
+  console.log(req.user);
+  if (req.user == undefined) {
+    return res.status(400).json(new ErrorResponse("Error with JWT Token"));
+  }
+
   const emp_id = +req.params.emp_id;
   const employee = await getEmployeeData(emp_id);
 
   if (employee == null) {
-    res.status(404).json(new ErrorResponse("Employee not found."));
-    return;
+    return res.status(404).json(new ErrorResponse("Employee not found."));
   }
 
   const employeeDef = await employeeWithDepartment(employee);
-  res.status(200).json(employeeDef);
+  if (
+    req.user.department === "ADMIN" ||
+    req.user.department === employeeDef.department
+  ) {
+    res.status(200).json(employeeDef);
+  } else {
+    res
+      .status(404)
+      .json(new ErrorResponse("Employee not found in department."));
+  }
 };
 
 export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
@@ -71,7 +99,7 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
 
   const newEmployee = await updateEmployeeData(
     emp_id,
-    request.name,
+    request.name,    
     request.salary,
     request.department
   );
@@ -92,7 +120,7 @@ export const updateEmployee: RequestHandler<{ emp_id: string }> = async (
 };
 
 export const deleteEmployee: RequestHandler<{ emp_id: string }> = async (
-  req,
+  req : UserRequest,
   res,
   next
 ) => {

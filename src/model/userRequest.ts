@@ -8,6 +8,6 @@ export class UserSignUpRequest {
   ) {}
 }
 
-export class UserLogInRequest {
+export class UserLoginRequest {
   constructor(public username: string, public password: string) {}
 }

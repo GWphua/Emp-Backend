@@ -5,24 +5,28 @@ import {
   deleteEmployee,
   getAllEmployees,
   getEmployee,
-  updateEmployee
+  updateEmployee,
 } from "../controller/employees";
-import { signUp, getAllUsers, login } from "../controller/users";
+import { signup, getAllUsers, login, authorizeUser } from "../controller/users";
 import {
   validateEmployeeId,
-  validateEmployeeRequest
+  validateEmployeeRequest,
+  validateLoginRequest,
+  validateSignupRequest,
 } from "../middleware/validation";
+import { verifyToken } from "../middleware/verifyToken";
 
 const router = Router();
 
-router.get("/", getAllEmployees);
+router.get("/", verifyToken, getAllEmployees);
 router.get("/department", getAllDepartments);
-router.get("/users", getAllUsers);
-router.get("/:emp_id", validateEmployeeId, getEmployee);
+router.get("/users", verifyToken, getAllUsers);
+router.get("/:emp_id", verifyToken, validateEmployeeId, getEmployee);
+router.get("/authorize", authorizeUser);
 
-router.post("/", validateEmployeeRequest, createEmployee);
-router.post("/signup", signUp);
-router.post("/login", login);
+router.post("/", verifyToken, validateEmployeeRequest, createEmployee);
+router.post("/signup", validateSignupRequest, signup);
+router.post("/login", validateLoginRequest, login);
 
 router.put(
   "/:emp_id",
