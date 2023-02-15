@@ -17,6 +17,17 @@ export async function getAllEmployeeData(): Promise<Employee[]> {
   return await Employee.findAll({ order: [["id", "ASC"]] });
 }
 
+export async function getAllEmployeeInDepartment(
+  department: DepartmentType
+): Promise<Employee[]> {
+  const department_id = await getDepartmentId(department);
+
+  return await Employee.findAll({
+    order: [["id", "ASC"]],
+    where: { department_id: department_id },
+  });
+}
+
 export async function getEmployeeData(
   emp_id: number
 ): Promise<Employee | null> {
