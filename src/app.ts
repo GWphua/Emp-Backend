@@ -1,9 +1,9 @@
 import { json } from "body-parser";
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
-import employeeRouter from "./routes/employees";
-import cors from 'cors';
 import session from "express-session";
 import { sequelize } from "../sequelize";
+import employeeRouter from "./routes/employees";
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(
     saveUninitialized: false,
     store: new SequelizeStore({
       db: sequelize,
-    })
+    }),
   })
 );
 

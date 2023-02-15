@@ -77,11 +77,10 @@ export const login: RequestHandler = async (req, res, next) => {
       username: user.username,
       department: user.department,
     } as UserJwtPayload;
-    const token = jwt.sign(payload, secret, { expiresIn: "1h" });
+    const token = jwt.sign(payload, secret);
 
     res.status(200).json({ loggedIn: true, token: token });
   } else {
-    console.log("LOGIN FAILED> PASSWORD WRITE PROPERLY LAH")
     res.status(401).json(new ErrorResponse("Incorrect credentials!"));
   }
 };
