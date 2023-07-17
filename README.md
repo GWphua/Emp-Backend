@@ -1,3 +1,3 @@
-# Training-Mavericks-Backend
+# Employee Project - Backend
 
 Backend Server for Employees project.
